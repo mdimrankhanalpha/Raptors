@@ -8,7 +8,7 @@ const CFG={
   'https://github.com/mdimrankhanalpha/Raptors/blob/main/file_000000006ba48211b843be786dd522d8.png',
   'https://github.com/mdimrankhanalpha/Raptors/blob/main/file_00000000aad481fab372c5be6d3148f7.png',
   'https://github.com/mdimrankhanalpha/Raptors/blob/main/file_00000000aea881f8a57c1791491baeb8.png'],
- shuffleMs:5000,rolePhotos:{}, /* optional real photos: {'Eliminator':['https://github.com/USER/REPO/blob/main/sniper1.png']} */
+ shuffleMs:5000,troopsBase:'troops/',photosPerRole:3,photoExt:'png',rolePhotos:{}, /* optional real photos: {'Eliminator':['https://github.com/USER/REPO/blob/main/sniper1.png']} */
  refreshMs:60000,batch:10,pBatch:24,baseId:'7400000000000001'};
 const $=id=>document.getElementById(id);
 const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -198,9 +198,13 @@ const OPS=['Siege of Vael Ridge','Purge of Hollow Marsh','Battle of Ashfall Spir
 const norm=s=>s.replace(/^0+(?=\d)/,'');
 /* Portrait generator: unique per ID (seed), styled by role and rank. Optional real photos: CFG.rolePhotos */
 const LV=[1,0,1,1,1,1,2,3,4,5,6,2,2,3,3,2,1,3,3,2,1,1,1,3];
-function photo(ri,seed,lv){
+const slug=n=>n.toLowerCase().replace(/&/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+function photoUrl(ri,seed){
  const pool=CFG.rolePhotos&&CFG.rolePhotos[R[ri][0]];
  if(pool&&pool.length)return toRaw(pool[seed%pool.length]);
+ return CFG.troopsBase+slug(R[ri][0])+'-'+(seed%CFG.photosPerRole+1)+'.'+CFG.photoExt;
+}
+function drawPhoto(ri,seed,lv){
  const r=rng(seed),P=(a,b)=>a+r()*(b-a),v=(seed>>1)%3,F='#0b0d0c',S='#A8ACA7',L='#303A2A';
  const rifle=(long)=>`<g transform="rotate(-18 80 140)"><rect x="${long?-20:10}" y="134" width="${long?200:150}" height="7" fill="${F}" stroke="${L}"/><rect x="40" y="124" width="30" height="9" rx="3" fill="${F}" stroke="${L}"/><circle cx="70" cy="128" r="4.5" fill="#A51E25"/><rect x="60" y="140" width="24" height="12" fill="${F}"/></g>`;
  const cam=[1,2,3,19].includes(ri),hood=cam||ri===14;
@@ -264,14 +268,15 @@ function gen(id){
   ach:[r()<.5?'Chapter Honour Marker':'Mention in dispatches',r()<.3?'Vael Ridge Commendation':'Service Stripe '+(1+Math.floor(r()*5))],
   assign:dead?'None — interred':st==='Deployed'?'Forward deployment, '+pick(OPS):'Garrison, '+company,
   bio:`${name}, callsign "${call}", serves the Raptors as ${role[0]} (${rank}) of ${company}, specialising in ${role[6].toLowerCase()}.`,
-  get img(){return photo(ri,seed,LV[ri])}};
+  get img(){return photoUrl(ri,seed)},get art(){return drawPhoto(ri,seed,LV[ri])}};
 }
 function ordinal(n){return n+(['th','st','nd','rd'][(n%10>3||(n>10&&n<14))?0:n%10]||'th')}
 const recHtml=p=>`<div class="rec"><img src="${p.img}" alt=""><h2>${esc(p.name)}</h2><p>${esc(p.bio)}</p><dl><dt>ID</dt><dd>${p.id}</dd><dt>Callsign</dt><dd>${esc(p.call)}</dd><dt>Rank</dt><dd>${esc(p.rank)}</dd><dt>Profession</dt><dd>${esc(p.role)}</dd><dt>Company</dt><dd>${esc(p.company)}</dd><dt>Squad</dt><dd>${esc(p.sq)}</dd><dt>Specialization</dt><dd>${esc(p.spec)}</dd><dt>Service start</dt><dd>${p.start}.M41</dd><dt>Birth record</dt><dd>${p.born}</dd><dt>Status</dt><dd>${p.status}</dd><dt>Assignment</dt><dd>${esc(p.assign)}</dd><dt>Armour</dt><dd>${esc(p.armour)}</dd><dt>Weapons</dt><dd>${esc(p.weapon)}</dd><dt>Equipment</dt><dd>${esc(p.gear)}</dd></dl><h3>Timeline</h3><ul>${p.tl.map(e=>`<li>${e.y}.M41 — ${esc(e.t)}</li>`).join('')}</ul><h3>Operations</h3><ul>${p.ops.map(o=>`<li>${esc(o)}</li>`).join('')}</ul><h3>Achievements</h3><ul>${p.ach.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></div>`;
-const openRec=p=>Viewer.showHtml(recHtml(p));
+const fb=(im,p)=>{im.loading='lazy';im.onerror=()=>{im.onerror=null;im.src=p.art}};
+const openRec=p=>{Viewer.showHtml(recHtml(p));const im=document.querySelector('#mbody .rec img');if(im)fb(im,p)};
 function card(p){const c=document.createElement('div');c.className='card';c.tabIndex=0;
  c.innerHTML=`<img src="${p.img}" alt=""><div><h3>${esc(p.name)} "${esc(p.call)}"</h3><small>ID ${p.id}</small><small>${esc(p.rank)} · ${esc(p.role)}</small><small>${esc(p.company)} · ${esc(p.sq)}</small><small class="${p.status==='Active'||p.status==='Deployed'?'':'st'}">${p.status}</small></div>`;
- c.onclick=()=>openRec(p);c.onkeydown=e=>{if(e.key==='Enter')openRec(p)};return c}
+ fb(c.querySelector('img'),p);c.onclick=()=>openRec(p);c.onkeydown=e=>{if(e.key==='Enter')openRec(p)};return c}
 const Raptors=(()=>{let nextId=BigInt(CFG.baseId);
  const idAt=n=>(BigInt(CFG.baseId)+BigInt(n)).toString();
  let pend=false;function more(){if(pend)return;pend=true;let n=0;(function step(){const f=document.createDocumentFragment();for(let i=0;i<6;i++){f.appendChild(card(gen(nextId.toString())));nextId++}$('people').appendChild(f);n+=6;if(n<CFG.pBatch)requestAnimationFrame(step);else pend=false})()}
@@ -310,7 +315,7 @@ const Fx=(()=>{
   if((navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2))root.classList.add('lite');
   document.addEventListener('visibilitychange',()=>root.classList.toggle('paused',document.hidden));
   if(!reduced&&!root.classList.contains('lite')){const e=$('embers');
-   for(let i=0;i<14;i++){const s=document.createElement('i');s.style.cssText=`left:${Math.random()*100}%;animation-delay:${-Math.random()*14}s;animation-duration:${9+Math.random()*10}s;--s:${.5+Math.random()*1.2}`;e.appendChild(s)}}
+   for(let i=0;i<8;i++){const s=document.createElement('i');s.style.cssText=`left:${Math.random()*100}%;animation-delay:${-Math.random()*14}s;animation-duration:${9+Math.random()*10}s;--s:${.5+Math.random()*1.2}`;e.appendChild(s)}}
   const p=$('prog');let raf=0;
   addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;const h=document.documentElement.scrollHeight-innerHeight;p.style.transform='scaleX('+(h>0?scrollY/h:0)+')'})},{passive:true});
  }
