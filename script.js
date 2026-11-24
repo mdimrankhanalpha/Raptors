@@ -140,15 +140,15 @@ const Feed=(()=>{
   if(old.length===0)more();
  }
  async function load(manual){
-  if(loading)return;loading=true;const st=$('pstatus');if(manual)st.textContent='Refreshing…';
+  if(loading)return;loading=true;const st=$('pstatus');
   try{
-   const res=await fetch(toRaw(CFG.postUrl)+'?t='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+   const res=await fetch(toRaw(CFG.postUrl)+'?t='+Date.now(),{cache:'no-store'});
    if(res.status===429||res.status===403)throw new Error('Rate limited by GitHub');
    if(!res.ok)throw new Error('HTTP '+res.status);
    sync(parsePosts(await res.text()));fails=0;
-   st.textContent='Updated '+new Date().toLocaleTimeString();
+   st.textContent='';
   }catch(e){
-   fails++;st.textContent=(navigator.onLine?'Update failed: ':'Offline: ')+e.message+' — showing last known posts';
+   fails++;st.textContent=(navigator.onLine?'Could not load posts: ':'Offline: ')+e.message+(posts.length?' — showing last known posts':' — retrying');
    if(fails<4)setTimeout(()=>load(),Math.min(30000,2000*2**fails));
   }finally{loading=false}
  }
@@ -249,11 +249,10 @@ const Raptors=(()=>{let nextId=BigInt(CFG.baseId);
 /* ===== Navigation + search ===== */
 const Nav=(()=>{
  function go(v){const r=v==='raptors';$('profile').hidden=r;$('raptors').hidden=!r;
-  $('nProfile').classList.toggle('on',!r);$('nRaptors').classList.toggle('on',r);$('search').hidden=true;scrollTo(0,0)}
+  $('nRaptors').hidden=r;$('search').hidden=true;scrollTo(0,0)}
  return{init(){
-  $('nProfile').onclick=$('back').onclick=()=>go('profile');
-  $('nRaptors').onclick=$('emblem').onclick=()=>go('raptors');
-  $('nRefresh').onclick=()=>Feed.load(true);
+  $('back').onclick=()=>go('profile');
+  $('nRaptors').onclick=()=>go('raptors');
   $('nSearch').onclick=()=>{const s=$('search');s.hidden=!s.hidden;if(!s.hidden)$('q').focus()};
   $('qx').onclick=()=>$('search').hidden=true;
   let t;$('q').oninput=e=>{clearTimeout(t);t=setTimeout(()=>{
