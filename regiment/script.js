@@ -8,7 +8,8 @@ const CFG={
   'https://github.com/mdimrankhanalpha/Raptors/blob/main/file_000000006ba48211b843be786dd522d8.png',
   'https://github.com/mdimrankhanalpha/Raptors/blob/main/file_00000000aad481fab372c5be6d3148f7.png',
   'https://github.com/mdimrankhanalpha/Raptors/blob/main/file_00000000aea881f8a57c1791491baeb8.png'],
- shuffleMs:5000,refreshMs:60000,batch:10,pBatch:24,baseId:'7400000000000001'};
+ shuffleMs:5000,rolePhotos:{}, /* optional real photos: {'Eliminator':['https://github.com/USER/REPO/blob/main/sniper1.png']} */
+ refreshMs:60000,batch:10,pBatch:24,baseId:'7400000000000001'};
 const $=id=>document.getElementById(id);
 const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -195,14 +196,53 @@ const CALL=['Talon','Shade','Owl','Reaper','Fang','Gale','Hollow','Ember','Ghost
 const STAT=['Active','Deployed','Reserve','Recovering','Missing in Action','Killed in Action'];
 const OPS=['Siege of Vael Ridge','Purge of Hollow Marsh','Battle of Ashfall Spire','Culling of Thorne Basin','Defence of Cold Harbour','Night Hunt of Kharn','Reclamation of Nerus Gate','Forest Strike on Mire-9','Relief of Orsin Keep','Ghost Run of Draken Pass'];
 const norm=s=>s.replace(/^0+(?=\d)/,'');
-const SVGS={};
-function photo(role,seed){
- const k=role+seed%3;if(SVGS[k])return SVGS[k];
- const ab=role.split(/[ &]+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();
- return SVGS[k]='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 84"><rect width="84" height="84" fill="#101B15"/><path d="M0 84V60l20-8 22-6 22 6 20 8v24z" fill="#18271D"/><path d="M26 52V30c0-10 8-18 16-18s16 8 16 18v22l-8 6H34z" fill="#080A09" stroke="#A8ACA7" stroke-width="1.5"/><rect x="31" y="31" width="9" height="3" fill="#A51E25"/><rect x="44" y="31" width="9" height="3" fill="#A51E25"/><text x="42" y="75" font-size="10" fill="#A8ACA7" text-anchor="middle" font-family="Georgia">${ab}</text></svg>`);
+/* Portrait generator: unique per ID (seed), styled by role and rank. Optional real photos: CFG.rolePhotos */
+const LV=[1,0,1,1,1,1,2,3,4,5,6,2,2,3,3,2,1,3,3,2,1,1,1,3];
+function photo(ri,seed,lv){
+ const pool=CFG.rolePhotos&&CFG.rolePhotos[R[ri][0]];
+ if(pool&&pool.length)return toRaw(pool[seed%pool.length]);
+ const r=rng(seed),P=(a,b)=>a+r()*(b-a),v=(seed>>1)%3,F='#0b0d0c',S='#A8ACA7',L='#303A2A';
+ const rifle=(long)=>`<g transform="rotate(-18 80 140)"><rect x="${long?-20:10}" y="134" width="${long?200:150}" height="7" fill="${F}" stroke="${L}"/><rect x="40" y="124" width="30" height="9" rx="3" fill="${F}" stroke="${L}"/><circle cx="70" cy="128" r="4.5" fill="#A51E25"/><rect x="60" y="140" width="24" height="12" fill="${F}"/></g>`;
+ const cam=[1,2,3,19].includes(ri),hood=cam||ri===14;
+ let o=`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2a21"/><stop offset="1" stop-color="#070908"/></linearGradient><radialGradient id="e"><stop offset="0" stop-color="#ff4047"/><stop offset="1" stop-color="#A51E25" stop-opacity="0"/></radialGradient><radialGradient id="vg" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-opacity="0"/><stop offset="1" stop-opacity=".75"/></radialGradient><path id="a" d="M8 34c6-14 20-24 40-22l8 6-10 2 6 6-12 0 4 8-12-4 2 10-8-8-6 8z"/><path id="pl" d="M12 160Q6 112 38 100Q56 96 62 106V160Z"/><path id="pr" d="M148 160Q154 112 122 100Q104 96 98 106V160Z"/><clipPath id="c"><use href="#pl"/><use href="#pr"/></clipPath></defs><rect width="160" height="160" fill="url(#g)"/>`;
+ o+=v===0?'<circle cx="32" cy="30" r="15" fill="#D5D8D3" opacity=".8"/><circle cx="40" cy="26" r="11" fill="#1b2a21" opacity=".35"/>':v===1?'<path d="M0 100V40h14v-8h12v8h10v60zM118 100V30h10V18h10v12h22v70z" fill="#0d1410"/>':'<path d="M20 0V110M52 0V90M132 0V100" stroke="#0e1711" stroke-width="7"/>';
+ o+=`<path d="M112 0h40v70l-20-10-20 10z" fill="#0c120e" stroke="${L}"/><use href="#a" transform="translate(116 6) scale(.52)" fill="${S}" opacity=".75"/><g transform="${seed&1?'translate(160 0) scale(-1 1)':''}">`;
+ const EX={4:`<rect x="38" y="84" width="14" height="24" fill="${F}"/><rect x="108" y="84" width="14" height="24" fill="${F}"/><path d="M122 160L142 96" stroke="${S}" stroke-width="5" stroke-dasharray="3 2"/>`,
+ 5:`<rect x="14" y="128" width="130" height="14" rx="4" fill="${F}" stroke="${L}"/><rect x="136" y="122" width="20" height="26" fill="${F}" stroke="${L}"/><path d="M26 152h100" stroke="${S}" stroke-dasharray="3 3"/>`,
+ 12:`<circle cx="36" cy="46" r="15" stroke="${S}" stroke-dasharray="3 2" fill="none"/><path d="M122 104Q150 84 140 50" stroke="${L}" stroke-width="6" fill="none"/><path d="M133 50l7-10 7 10" stroke="${S}" fill="none"/>`,
+ 13:`<path d="M138 34V160" stroke="${S}" stroke-width="4"/><circle cx="138" cy="28" r="8" fill="${S}"/>`,
+ 14:`<circle cx="80" cy="56" r="44" fill="url(#e)" opacity=".22"/><path d="M140 20V160" stroke="${S}" stroke-width="3"/>`,
+ 15:`<path d="M22 100l34 34" stroke="${S}" stroke-width="5"/><circle cx="20" cy="98" r="7" fill="none" stroke="${S}" stroke-width="3"/>`,
+ 16:`<path d="M104 60V24" stroke="${S}" stroke-width="2"/><path d="M58 60q-8 4 0 14" stroke="${S}" stroke-width="3" fill="none"/>`,
+ 17:`<rect x="96" y="66" width="70" height="9" fill="${F}" transform="rotate(-14 96 66)"/><ellipse cx="80" cy="152" rx="76" ry="14" fill="${F}" stroke="${S}"/>`,
+ 20:`<path d="M52 92V10M108 92V22" stroke="${S}"/>`,21:`<rect x="100" y="118" width="46" height="32" fill="${L}" stroke="${S}"/><path d="M123 118v32" stroke="${S}"/>`,
+ 22:`<circle cx="134" cy="38" r="17" fill="#050706" stroke="${S}" stroke-width="3"/><circle cx="128" cy="34" r="1.5" fill="#D5D8D3"/>`,
+ 10:`<path d="M138 20V160" stroke="${S}" stroke-width="3"/><path d="M132 22l6-14 6 14z" fill="${S}"/>`,23:`<path d="M138 20V160" stroke="${S}" stroke-width="3"/><path d="M132 22l6-14 6 14z" fill="${S}"/>`};
+ if(ri===18){o+=`<rect x="34" y="36" width="92" height="88" rx="12" fill="#131c16" stroke="${S}"/><rect x="54" y="54" width="52" height="24" fill="#050706"/><circle cx="68" cy="66" r="9" fill="url(#e)"/><circle cx="92" cy="66" r="9" fill="url(#e)"/><rect x="6" y="100" width="34" height="50" rx="6" fill="${F}" stroke="${S}"/><rect x="120" y="100" width="34" height="50" rx="6" fill="${F}" stroke="${S}"/><use href="#a" transform="translate(52 84) scale(.6)" fill="${S}" opacity=".8"/>`;}
+ else{
+  o+=EX[ri]||'';
+  if(hood)o+=`<path d="M50 62Q48 16 80 16Q112 16 110 62L122 112L98 98L80 110L62 98L38 112Z" fill="${ri===14?'#1c2420':'#2c3a22'}"/>`;
+  if(cam)for(let i=0;i<14;i++)o+=`<ellipse cx="${P(58,102)}" cy="${P(24,60)}" rx="${P(3,7)}" ry="${P(2,5)}" fill="${['#1a2a1d','#4a5a32','#0a0f0b'][i%3]}"/>`;
+  o+=`<use href="#pl" fill="#131c16" stroke="${S}" stroke-width=".6"/><use href="#pr" fill="#131c16" stroke="${S}" stroke-width=".6"/>`;
+  if(cam)for(let i=0;i<22;i++)o+=`<ellipse clip-path="url(#c)" cx="${P(8,152)}" cy="${P(96,160)}" rx="${P(3,8)}" ry="${P(2,6)}" fill="${['#1f3322','#33452a','#090c0a'][i%3]}"/>`;
+  o+=`<rect x="62" y="96" width="36" height="64" fill="#0f1712"/><circle cx="80" cy="122" r="5" fill="${S}" opacity=".8"/><use href="#a" transform="translate(20 106) scale(.55)" fill="${S}" opacity=".85"/>`;
+  for(let i=0;i<Math.min(lv,6);i++)o+=`<path d="M112 ${112+i*5}l9 4 9-4" stroke="${S}" stroke-width="1.6" fill="none"/>`;
+  if(ri===9||ri===8||ri===10||ri===23)o+=`<path d="M62 36Q80 ${ri===9?-8:8} 98 36Z" fill="#761E20"/>`;
+  if(ri===11)o+=`<path d="M62 100h-0" /><path d="M80 112v14M73 119h14" stroke="#A51E25" stroke-width="4"/>`;
+  o+=`<rect x="64" y="90" width="32" height="10" fill="#0a0d0b"/>`;
+  if(ri===13)o+=`<path d="M60 50Q60 26 80 26Q100 26 100 50V76Q100 88 90 92H70Q60 88 60 76Z" fill="#090b0a" stroke="${L}"/><ellipse cx="80" cy="62" rx="15" ry="19" fill="#cfd2cc"/><ellipse cx="73" cy="58" rx="4.5" ry="5.5" fill="#050706"/><ellipse cx="87" cy="58" rx="4.5" ry="5.5" fill="#050706"/><circle cx="73" cy="58" r="1.6" fill="#A51E25"/><circle cx="87" cy="58" r="1.6" fill="#A51E25"/><path d="M78 68l2 5 2-5zM72 80h16" stroke="#050706" fill="#050706"/>`;
+  else o+=`<path d="M60 50Q60 28 80 28Q100 28 100 50V76Q100 88 90 92H70Q60 88 60 76Z" fill="#17221a" stroke="${L}" stroke-width="1.5"/><path d="M70 74h20v14H70z" fill="#0a0d0b"/><path d="M73 76v10M77 76v10M81 76v10M85 76v10" stroke="${S}" stroke-width=".8"/><circle cx="71" cy="56" r="9" fill="url(#e)" opacity=".55"/><circle cx="89" cy="56" r="9" fill="url(#e)" opacity=".55"/><ellipse cx="71" cy="56" rx="5.5" ry="2.4" fill="#A51E25"/><ellipse cx="89" cy="56" rx="5.5" ry="2.4" fill="#A51E25"/><path d="M60 40Q80 34 100 40" stroke="#000" stroke-width="6" opacity=".25" fill="none"/>`;
+  if(ri===7)o+=`<path d="M80 28v18" stroke="#761E20" stroke-width="5"/>`;if(ri===11)o+=`<path d="M80 28v18" stroke="#D5D8D3" stroke-width="5"/>`;
+  if(ri===6)o+=`<path d="M60 44h5M60 49h6M60 54h5" stroke="${S}" stroke-width="1.5"/>`;
+  if(ri===19)o+=`<circle cx="70" cy="132" r="8" fill="${F}" stroke="${S}"/><circle cx="90" cy="132" r="8" fill="${F}" stroke="${S}"/>`;
+  if([0,1].includes(ri))o+=rifle(false);if([2,3].includes(ri))o+=rifle(true);
+ }
+ for(let i=0;i<7;i++){const x=P(10,150),y=P(20,150);o+=`<path d="M${x} ${y}l${P(-9,9)} ${P(3,9)}" stroke="#D5D8D3" opacity=".12"/>`}
+ o+=`</g><rect width="160" height="160" fill="url(#vg)"/><rect x=".5" y=".5" width="159" height="159" fill="none" stroke="${S}" opacity=".45"/>`;
+ return'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">${o}</svg>`);
 }
 function gen(id){
- id=norm(id);const r=rng(H(id)),pick=a=>a[Math.floor(r()*a.length)];
+ id=norm(id);const seed=H(id),r=rng(seed),pick=a=>a[Math.floor(r()*a.length)];
  const ri=Math.floor(r()*R.length),role=R[ri],sc=role[5];
  const name=pick(N1)+' '+pick(N2),call=pick(CALL),co=1+Math.floor(r()*10);
  const company=sc==='H'?'Chapter Command':ordinal(co)+' Company';
@@ -224,7 +264,7 @@ function gen(id){
   ach:[r()<.5?'Chapter Honour Marker':'Mention in dispatches',r()<.3?'Vael Ridge Commendation':'Service Stripe '+(1+Math.floor(r()*5))],
   assign:dead?'None — interred':st==='Deployed'?'Forward deployment, '+pick(OPS):'Garrison, '+company,
   bio:`${name}, callsign "${call}", serves the Raptors as ${role[0]} (${rank}) of ${company}, specialising in ${role[6].toLowerCase()}.`,
-  img:photo(role[0],ri)};
+  get img(){return photo(ri,seed,LV[ri])}};
 }
 function ordinal(n){return n+(['th','st','nd','rd'][(n%10>3||(n>10&&n<14))?0:n%10]||'th')}
 const recHtml=p=>`<div class="rec"><img src="${p.img}" alt=""><h2>${esc(p.name)}</h2><p>${esc(p.bio)}</p><dl><dt>ID</dt><dd>${p.id}</dd><dt>Callsign</dt><dd>${esc(p.call)}</dd><dt>Rank</dt><dd>${esc(p.rank)}</dd><dt>Profession</dt><dd>${esc(p.role)}</dd><dt>Company</dt><dd>${esc(p.company)}</dd><dt>Squad</dt><dd>${esc(p.sq)}</dd><dt>Specialization</dt><dd>${esc(p.spec)}</dd><dt>Service start</dt><dd>${p.start}.M41</dd><dt>Birth record</dt><dd>${p.born}</dd><dt>Status</dt><dd>${p.status}</dd><dt>Assignment</dt><dd>${esc(p.assign)}</dd><dt>Armour</dt><dd>${esc(p.armour)}</dd><dt>Weapons</dt><dd>${esc(p.weapon)}</dd><dt>Equipment</dt><dd>${esc(p.gear)}</dd></dl><h3>Timeline</h3><ul>${p.tl.map(e=>`<li>${e.y}.M41 — ${esc(e.t)}</li>`).join('')}</ul><h3>Operations</h3><ul>${p.ops.map(o=>`<li>${esc(o)}</li>`).join('')}</ul><h3>Achievements</h3><ul>${p.ach.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></div>`;
