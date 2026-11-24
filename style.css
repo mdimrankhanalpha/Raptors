@@ -103,3 +103,9 @@ main{max-width:clamp(320px,94vw,860px);padding-left:max(1rem,env(safe-area-inset
 .lite .fog,.lite .scan,.lite .ring::before,.lite .badge::after,.lite .bar::after,.lite .fx{animation:none!important;display:none}
 .lite .post,.lite .card,.lite main>section{animation:none!important}
 .paused *,.paused *::before,.paused *::after{animation-play-state:paused!important}
+
+.strip{text-align:center;font-size:.68rem;letter-spacing:.22em;color:var(--sv);margin:-.4rem 0 1rem;animation:flick 7s infinite}
+@keyframes flick{0%,92%,100%{opacity:1}94%{opacity:.35}96%{opacity:1}98%{opacity:.5}}
+.card img{width:96px;height:96px;border:1px solid var(--sv);box-shadow:0 0 10px rgba(0,0,0,.6);transition:box-shadow .3s}
+.card:hover img{box-shadow:0 0 14px rgba(165,30,37,.6)}
+.rec img{display:block;width:min(100%,260px);height:auto;aspect-ratio:1;margin:0 auto .8rem;border:1px solid var(--sv);box-shadow:0 0 22px rgba(165,30,37,.3)}
