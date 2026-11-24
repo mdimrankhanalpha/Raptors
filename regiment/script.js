@@ -1,7 +1,7 @@
 'use strict';
 /* ===== CONFIG (edit here only) ===== */
 const CFG={
- name:'REGIMENT',
+ name:'Raptors',
  desc:'Raptors Chapter — Personal Identity Record\nOne chapter. Infinite identities.',
  postUrl:'https://github.com/mdimrankhanalpha/Raptors/blob/main/Post.txt',
  images:[
@@ -122,7 +122,7 @@ function scroller(sentinel,fn,active){
  const check=()=>{if(busy||!active())return;const r=sentinel.getBoundingClientRect();
   if(r.top<innerHeight+1500){busy=true;const y=scrollY;fn();if(Math.abs(scrollY-y)>1)scrollTo(0,y);busy=false}};
  if('IntersectionObserver'in window)new IntersectionObserver(check,{rootMargin:'1500px'}).observe(sentinel);
- addEventListener('scroll',check,{passive:true});addEventListener('resize',check);setInterval(check,1000);
+ let tk=false;addEventListener('scroll',()=>{if(!tk){tk=true;requestAnimationFrame(()=>{tk=false;check()})}},{passive:true});addEventListener('resize',check);setInterval(()=>{if(!document.hidden)check()},1500);
  return check;
 }
 /* ===== Feed + refresh ===== */
@@ -234,7 +234,7 @@ function card(p){const c=document.createElement('div');c.className='card';c.tabI
  c.onclick=()=>openRec(p);c.onkeydown=e=>{if(e.key==='Enter')openRec(p)};return c}
 const Raptors=(()=>{let nextId=BigInt(CFG.baseId);
  const idAt=n=>(BigInt(CFG.baseId)+BigInt(n)).toString();
- function more(){const f=document.createDocumentFragment();for(let i=0;i<CFG.pBatch;i++){f.appendChild(card(gen(nextId.toString())));nextId++}$('people').appendChild(f)}
+ let pend=false;function more(){if(pend)return;pend=true;let n=0;(function step(){const f=document.createDocumentFragment();for(let i=0;i<6;i++){f.appendChild(card(gen(nextId.toString())));nextId++}$('people').appendChild(f);n+=6;if(n<CFG.pBatch)requestAnimationFrame(step);else pend=false})()}
  let cache=null;
  const all=()=>cache||(cache=Array.from({length:3000},(_,i)=>gen(idAt(i))));
  function find(q){q=q.trim();if(!q)return[];const out=[];
@@ -243,12 +243,13 @@ const Raptors=(()=>{let nextId=BigInt(CFG.baseId);
   for(const p of all()){if(out.length>=30)break;if(p.id===q)continue;
    if([p.name,p.call,p.rank,p.role,p.company,p.sq,p.spec,p.status,p.id].some(v=>v.toLowerCase().includes(l)))out.push(p)}
   return out}
- return{init(){more();scroller($('pEnd'),more,()=>!$('raptors').hidden)},find};
+ return{init(){more();setTimeout(more,400);scroller($('pEnd'),more,()=>!$('raptors').hidden)},find};
 })();
 
 /* ===== Navigation + search ===== */
 const Nav=(()=>{
- function go(v){const r=v==='raptors';$('profile').hidden=r;$('raptors').hidden=!r;
+ let started=false;
+ function go(v){const r=v==='raptors';if(r&&!started){started=true;Raptors.init()}$('profile').hidden=r;$('raptors').hidden=!r;
   $('nRaptors').hidden=r;$('search').hidden=true;scrollTo(0,0)}
  return{init(){
   $('back').onclick=()=>go('profile');
@@ -262,9 +263,22 @@ const Nav=(()=>{
  }};
 })();
 
+/* ===== Effects (cheap, compositor-only) ===== */
+const Fx=(()=>{
+ function init(){
+  const root=document.documentElement;
+  if((navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2))root.classList.add('lite');
+  document.addEventListener('visibilitychange',()=>root.classList.toggle('paused',document.hidden));
+  if(!reduced&&!root.classList.contains('lite')){const e=$('embers');
+   for(let i=0;i<14;i++){const s=document.createElement('i');s.style.cssText=`left:${Math.random()*100}%;animation-delay:${-Math.random()*14}s;animation-duration:${9+Math.random()*10}s;--s:${.5+Math.random()*1.2}`;e.appendChild(s)}}
+  const p=$('prog');let raf=0;
+  addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;const h=document.documentElement.scrollHeight-innerHeight;p.style.transform='scaleX('+(h>0?scrollY/h:0)+')'})},{passive:true});
+ }
+ return{init};
+})();
 /* ===== Boot ===== */
 document.addEventListener('DOMContentLoaded',()=>{
  document.title=CFG.name+' — The Infinite Raptors Universe';
  $('pname').textContent=CFG.name;$('pdesc').textContent=CFG.desc;
- Shuffle.init();Nav.init();Raptors.init();Feed.init();
+ Fx.init();Shuffle.init();Nav.init();Feed.init();
 });
