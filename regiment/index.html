@@ -3,18 +3,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>REGIMENT — The Infinite Raptors Universe</title>
 <link rel="stylesheet" href="style.css"></head>
-<body>
+<body><div class="fog"></div><div class="fog f2"></div>
 <header class="bar"><b class="logo">REGIMENT</b>
-<nav><button id="nProfile" class="on">Personal Profile</button><button id="nRaptors">Infinite Raptors</button><button id="nSearch" aria-label="Search personnel">&#9906; Search</button><button id="nRefresh" aria-label="Refresh posts">&#8635; Refresh</button></nav></header>
+<nav><button id="nSearch" aria-label="Search personnel">&#9906;</button><button id="nRaptors" class="rap"><svg viewBox="0 0 64 64"><path d="M8 34c6-14 20-24 40-22l8 6-10 2 6 6-12 0 4 8-12-4 2 10-8-8-6 8z" fill="#A8ACA7"/><circle cx="40" cy="20" r="2" fill="#A51E25"/></svg>INFINITE RAPTORS</button></nav></header>
 <main>
 <section id="profile">
- <div class="head">
-  <div class="pic"><img id="picA" alt="Profile"><img id="picB" alt=""></div>
-  <button id="emblem" class="emblem" aria-label="Open Infinite Raptors"><svg viewBox="0 0 64 64"><path d="M8 34c6-14 20-24 40-22l8 6-10 2 6 6-12 0 4 8-12-4 2 10-8-8-6 8z" fill="#A8ACA7"/><circle cx="40" cy="20" r="2" fill="#A51E25"/></svg><span>INFINITE RAPTORS</span></button>
- </div>
+ <div class="head"><div class="ring"><div class="pic"><img id="picA" alt="Profile"><img id="picB" alt=""><i class="scan"></i></div></div></div>
  <h1 id="pname"></h1><p id="pdesc" class="desc"></p>
- <div class="stats"><span><b id="pcount">0</b> posts</span><span class="badge">RAPTORS · CLASSIFIED</span><span id="pstatus" class="muted"></span></div>
- <div id="feed"></div><div id="feedEnd" class="sent"></div>
+ <div class="stats"><span><b id="pcount">0</b> posts</span><span class="badge">RAPTORS · CLASSIFIED</span></div>
+ <p id="pstatus" class="muted err"></p><div id="feed"></div><div id="feedEnd" class="sent"></div>
 </section>
 <section id="raptors" hidden>
  <div class="rbar"><button id="back">&#8592; Personal Profile</button><b>RAPTORS PERSONNEL ARCHIVE</b><span class="muted">Generated locally, deterministic by ID. Not stored.</span></div>
