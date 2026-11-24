@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>REGIMENT — The Infinite Raptors Universe</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="bar"><b class="logo">REGIMENT</b>
+<nav><button id="nProfile" class="on">Personal Profile</button><button id="nRaptors">Infinite Raptors</button><button id="nSearch" aria-label="Search personnel">&#9906; Search</button><button id="nRefresh" aria-label="Refresh posts">&#8635; Refresh</button></nav></header>
+<main>
+<section id="profile">
+ <div class="head">
+  <div class="pic"><img id="picA" alt="Profile"><img id="picB" alt=""></div>
+  <button id="emblem" class="emblem" aria-label="Open Infinite Raptors"><svg viewBox="0 0 64 64"><path d="M8 34c6-14 20-24 40-22l8 6-10 2 6 6-12 0 4 8-12-4 2 10-8-8-6 8z" fill="#A8ACA7"/><circle cx="40" cy="20" r="2" fill="#A51E25"/></svg><span>INFINITE RAPTORS</span></button>
+ </div>
+ <h1 id="pname"></h1><p id="pdesc" class="desc"></p>
+ <div class="stats"><span><b id="pcount">0</b> posts</span><span class="badge">RAPTORS · CLASSIFIED</span><span id="pstatus" class="muted"></span></div>
+ <div id="feed"></div><div id="feedEnd" class="sent"></div>
+</section>
+<section id="raptors" hidden>
+ <div class="rbar"><button id="back">&#8592; Personal Profile</button><b>RAPTORS PERSONNEL ARCHIVE</b><span class="muted">Generated locally, deterministic by ID. Not stored.</span></div>
+ <div id="people" class="grid"></div><div id="pEnd" class="sent"></div>
+</section>
+</main>
+<div id="search" class="panel" hidden><input id="q" placeholder="ID, name, callsign, rank, role, company, squad, status" autocomplete="off"><button id="qx" aria-label="Close search">&#10005;</button><div id="res"></div></div>
+<div id="modal" class="modal" hidden><button id="mx" aria-label="Close">&#10005;</button><button id="mp" aria-label="Previous">&#8249;</button><button id="mn" aria-label="Next">&#8250;</button><div id="mbody"></div><div id="mcount"></div></div>
+<script src="script.js"></script></body></html>
