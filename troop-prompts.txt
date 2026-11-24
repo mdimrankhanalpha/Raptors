@@ -1,0 +1,31 @@
+RAPTORS TROOP PHOTO PROMPTS
+Generate 3 images per role in any image generator (square 1:1, ~1254px, PNG).
+Save as troops/<file>-1.png, -2.png, -3.png in your GitHub repo (same folder level as index.html).
+Style line to append to every prompt:
+"Warhammer 40,000 Raptors Space Marine, black metallic armour with dark forest-green camouflage, weathered silver-white raptor eagle insignia on the pauldron, glowing red helmet lenses, foggy forest, moonlit gothic ruins and a torn Raptors banner in the background, cinematic dark photoreal, low angle, 1:1"
+
+FILE (use exactly this name)             ROLE-SPECIFIC PART OF THE PROMPT
+tactical-marine                          standard bolter held at the chest, plain camouflage armour
+scout-marine                             lighter scout armour, hooded camouflage cloak, short sniper carbine, no full helmet crest
+infiltrator                              slim Phobos armour, ghillie hood, silenced marksman carbine, comms jammer on arm
+eliminator                               sniper in full ghillie hood and cloak, long scoped rifle with red lens, prone on mossy rock
+assault-marine                           jump pack on back, chainsword and bolt pistol, mid-leap pose
+heavy-support-marine                     bulky reinforced armour, heavy bolter with ammo belt
+veteran                                  battle-worn armour with silver service stripes and laurel, combi-weapon, power sword
+veteran-sergeant                         red helmet crest stripe, power fist, banner staff, squad vox
+lieutenant                               ornate artificer armour, red plume, power sword, command markings
+captain                                  large red crest plume, cloak, master-crafted pistol and power axe, company banner
+chapter-command-personnel                relic artificer armour, heavy cloak, relic blade, chapter seals, imposing
+apothecary                               white helmet stripe, narthecium medical gauntlet, gene-seed vials, red cross marking
+techmarine                               servo-arm and cog symbols, tool harness, plasma cutter, technical workshop background
+chaplain                                 black armour with skull-face helmet, crozius arcanum, rosarius
+librarian                                hooded psychic hood helmet, force staff, pale silver ghost-light glow
+armour-specialist                        heavy workshop plate, melta gun, repair tools beside an armoured vehicle
+vehicle-crew                             crew armour with headset, vehicle interior hatch, intercom
+tank-commander                           standing in tank cupola hatch, battle cannon barrel behind, tactical map
+dreadnought-pilot                         ancient Dreadnought walker with sarcophagus, twin autocannon, power fist
+intelligence-reconnaissance-specialist   light camouflage armour, auspex and binoculars, cipher slate
+communications-specialist                vox-pack with tall antenna, long-range comms gear
+logistics-officer                        utility armour, cargo slate, supply crates with chapter seals
+fleet-personnel                          voidsuit armour, strike cruiser corridor, boarding axe
+honour-guard                             ornate ceremonial armour, power halberd, chapter banner
